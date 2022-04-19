@@ -30,31 +30,11 @@ I = np.divide((R + G + B), 3)
 HSI = cv2.merge((H, S, I))
 
 
-# Part 2 -->
-Cmax = np.maximum(np.maximum(R, G), B)
-Cmin = np.minimum(np.maximum(R, G), B)
-delta = Cmax - Cmin
-if delta.all() == 0:
-    H1 = np.zeros_like(Cmax)
-elif np.equal(Cmax, R):
-    H1 = np.degrees(60) * (((G - B)/delta) + 0)
-elif np.equal(Cmax, G):
-    H1 = np.degrees(60) * (((B - R)/delta) + 2)
-elif np.equal(Cmax, B):
-    H1 = np.degrees(60) * (((R - G) / delta) + 4)
-
-if Cmax.all() == 0:
-    S1 = np.zeros_like(Cmax)
-else:
-    S1 = np.divide(delta ,Cmax)
-
-V = Cmax
-HSV = cv2.merge((H1, S1, V))
-
+# Part 2 --> find V from HSV
+V = np.maximum(np.maximum(R, G), B)
 
 cv2.imshow('Original image', BGRImage)
-cv2.imshow('HSV image using build in function', HSVImage)
+cv2.imshow('HSV image', HSVImage)
 cv2.imshow('HSI image', HSI)
-cv2.imshow('HSV image', HSV)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
