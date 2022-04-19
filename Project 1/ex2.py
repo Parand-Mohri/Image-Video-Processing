@@ -9,24 +9,54 @@ def histogram(image):
 
 
 BGRImage = cv2.imread("images project1/fog.jpg")
-Image = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2GRAY)
-histogram(Image)
+# ------- original image -----------
+# Image = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2GRAY)
 
+
+#  ----------- negative image --------
+# negImage = 255 - BGRImage
+
+
+# height, width, _ = BGRImage.shape
+# for i in range(0, height - 1):
+#     for j in range(0, width - 1):
+#         pixel = BGRImage[i, j]
+#         # pixel[0] = 255 - pixel[0]
+#         # pixel[1] = 255 - pixel[1]
+#         # pixel[2] = 255 - pixel[2]
+#         # negImage[i, j] = pixel
+
+
+def adjust_gamma(image):
+    # print(image.shape)
+    # bgrimage = cv2.cvtColor(bgrimage, cv2.COLOR_BGR2GRAY)
+    s = image
+    height, width, _ = image.shape
+    for i in range(0, height - 1):
+        for j in range(0, width - 1):
+            pixel = image[i, j]
+            # print(pixel)
+            # pixel[0] = pow(pixel[0], gamma)
+            # pixel[1] = pow(pixel[1], gamma)
+            # pixel[2] = pow(pixel[2], gamma)
+            s[i, j] = np.power(pixel, 0.7)
+            # print(pixel)
+    return s
+    # invGamma = 1.0 / gamma
+    # table = np.array([((i / 255.0) ** invGamma) * 255
+    # for i in np.arange(0, 256)]).astype("uint8")
+    # return cv2.LUT(image, table)
+
+
+#
+#
+# x = adjust_gamma(BGRImage, 0.7)
+x = adjust_gamma(BGRImage)
+# print(BGRImage.shape)
+cv2.imshow('gamma', x)
+# histogram(Image)
+# histogram(negImage)
 # cv2.imshow('original', Image)
-
-height, width, _ = BGRImage.shape
-negImage = BGRImage
-for i in range(0, height - 1):
-    for j in range(0, width - 1):
-        pixel = BGRImage[i, j]
-        pixel[0] = 255 - pixel[0]
-        pixel[1] = 255 - pixel[1]
-        pixel[2] = 255 - pixel[2]
-        negImage[i, j] = pixel
-# plt.imshow(BGRImage)
-# plt.show()
-cv2.imshow('neg', negImage)
-
-histogram(negImage)
+# cv2.imshow('neg', negImage)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
