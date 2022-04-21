@@ -8,13 +8,19 @@ def histogram(image):
     plt.show()
 
 
-BGRImage = cv2.imread("images project1/fog.jpg")
+BGRImage = cv2.imread("images project1/shadows.jpg")
 # ------- original image -----------
 # Image = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2GRAY)
 
-
 #  ----------- negative image --------
 # negImage = 255 - BGRImage
+
+# ------- histograms of the two images -------
+# histogram(Image)
+# histogram(negImage)
+
+# -------power law pointwise transform-------
+
 
 
 # height, width, _ = BGRImage.shape
@@ -25,6 +31,8 @@ BGRImage = cv2.imread("images project1/fog.jpg")
 #         # pixel[1] = 255 - pixel[1]
 #         # pixel[2] = 255 - pixel[2]
 #         # negImage[i, j] = pixel
+
+
 
 
 def adjust_gamma(image):
@@ -39,7 +47,7 @@ def adjust_gamma(image):
             # pixel[0] = pow(pixel[0], gamma)
             # pixel[1] = pow(pixel[1], gamma)
             # pixel[2] = pow(pixel[2], gamma)
-            s[i, j] = np.power(pixel, 0.7)
+            s[i, j] = np.power(pixel, 2)
             # print(pixel)
     return s
     # invGamma = 1.0 / gamma
@@ -53,9 +61,10 @@ def adjust_gamma(image):
 # x = adjust_gamma(BGRImage, 0.7)
 x = adjust_gamma(BGRImage)
 # print(BGRImage.shape)
+# S = np.power(BGRImage, 2)
 cv2.imshow('gamma', x)
-# histogram(Image)
-# histogram(negImage)
+# cv2.imshow('gamma', S)
+
 # cv2.imshow('original', Image)
 # cv2.imshow('neg', negImage)
 cv2.waitKey(0)

@@ -3,8 +3,7 @@ import math
 import cv2
 import numpy as np
 
-# BGRImage = cv2.imread("images project1/birds.jpg")
-BGRImage = cv2.imread("images project1/rgb_image.jpeg")
+BGRImage = cv2.imread("images project1/birds.jpg")
 RGBImage = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2RGB)
 # Part 1 --> using build in function to get HSV
 HSVImage = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2HSV)
@@ -15,10 +14,8 @@ R = rgb[:, :, 0]
 G = rgb[:, :, 1]
 B = rgb[:, :, 2]
 
-nominator = 1 / 2 * ((R - G) + (R - B))
-# nominator = np.multiply(0.5,((R - G) + (R - B)) )
+nominator = np.multiply(0.5, ((R - G) + (R - B)))
 denominator = np.sqrt(((R - G) * (R - G)) + ((R - B) * (G - B)))
-# denominator = np.sqrt(((R - G) * (R - G)) + ((R - B) * (G - B)))
 H = np.arccos(nominator / (denominator + 0.001))
 if B.all() > G.all():
     H = 360 - H
