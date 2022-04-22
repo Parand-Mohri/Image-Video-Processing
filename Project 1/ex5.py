@@ -12,22 +12,22 @@ BGRImage = cv2.imread("images project1/flower.jpeg")
 ima_gray = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2GRAY)
 row, col = ima_gray.shape
 X = np.linspace(0, 1, row)
-Y = np.linspace(0,1,col)
-iman = im2double(ima_gray) + np.multiply(np.cos(32*np.pi * (X+Y)), 0.25)
+Y = np.linspace(0, 1, col)
+iman = im2double(ima_gray) + np.multiply(np.cos(32*np.pi * X), 0.25)
 
 # cv2.imwrite("images project1/pnois1.jpg", g)
-f = np.fft.fft2(iman)
-f1 = np.fft.fftshift(f)
-power_spectrum = np.abs(f1) **2
+# f = np.fft.fft2(iman)
+# f1 = np.fft.fftshift(f)
+# power_spectrum = np.abs(f1) **2
 # plt.figure(2)
 # plt.clf()
-plt.imshow( np.log10( power_spectrum ))
-plt.show()
+# plt.imshow( np.log10( power_spectrum ))
+# plt.show()
 # plt.hist(power_spectrum.ravel(), 256, [0, 256])
 # plt.show()
 
 
 
-# cv2.imshow('noise', power_spectrum)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+cv2.imshow('noise', iman)
+cv2.waitKey(0)
+cv2.destroyAllWindows()

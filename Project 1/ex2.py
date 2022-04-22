@@ -10,7 +10,7 @@ def histogram(image):
 
 BGRImage = cv2.imread("images project1/shadows.jpg")
 # ------- original image -----------
-# Image = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2GRAY)
+# Imagegray = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2GRAY)
 
 #  ----------- negative image --------
 # negImage = 255 - BGRImage
@@ -35,37 +35,30 @@ BGRImage = cv2.imread("images project1/shadows.jpg")
 
 
 
-def adjust_gamma(image):
-    # print(image.shape)
-    # bgrimage = cv2.cvtColor(bgrimage, cv2.COLOR_BGR2GRAY)
-    s = image
-    height, width, _ = image.shape
-    for i in range(0, height - 1):
-        for j in range(0, width - 1):
-            pixel = image[i, j]
-            # print(pixel)
-            # pixel[0] = pow(pixel[0], gamma)
-            # pixel[1] = pow(pixel[1], gamma)
-            # pixel[2] = pow(pixel[2], gamma)
-            s[i, j] = np.power(pixel, 2)
-            # print(pixel)
-    return s
-    # invGamma = 1.0 / gamma
-    # table = np.array([((i / 255.0) ** invGamma) * 255
-    # for i in np.arange(0, 256)]).astype("uint8")
-    # return cv2.LUT(image, table)
+# def adjust_gamma(image):
+#     # print(image.shape)
+#     # bgrimage = cv2.cvtColor(bgrimage, cv2.COLOR_BGR2GRAY)
+#     s = image
+#     height, width, _ = image.shape
+#     for i in range(0, height - 1):
+#         for j in range(0, width - 1):
+#             pixel = image[i, j]
+#             s[i, j] = np.power(pixel, 2)
+#     return s
 
 
 #
 #
 # x = adjust_gamma(BGRImage, 0.7)
-x = adjust_gamma(BGRImage)
+# x = adjust_gamma(BGRImage)
 # print(BGRImage.shape)
-# S = np.power(BGRImage, 2)
-cv2.imshow('gamma', x)
-# cv2.imshow('gamma', S)
+# Image = np.divide(Imagegray, 255)
+S = np.power(BGRImage, 2)
+# cv2.imshow('gamma', x)
+# cv2.imshow('gamma', np.multiply(S, 255))
+cv2.imshow('gamma', S)
 
-# cv2.imshow('original', Image)
+# cv2.imshow('original', Imagegray)
 # cv2.imshow('neg', negImage)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
