@@ -28,11 +28,11 @@ cv2.imshow('polar coordinates', polar_image_Y)
 # colorImage = cv2.bilateralFilter(BGRImage, 9, 300, 300)
 #
 
-edges = cv2.Canny(BGRImage,100,200)
-cartoonImage = cv2.bitwise_and(BGRImage, BGRImage, mask=edges)
+# edges = cv2.Canny(BGRImage,100,200)
+# cartoonImage = cv2.bitwise_and(BGRImage, BGRImage, mask=edges)
 
 # s , t  = sobel_filters(BGRImage)
 # cv2.imshow("original image", BGRImage)
-cv2.imshow("x" , cartoonImage)
+# cv2.imshow("x" , cartoonImage)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
