@@ -1,11 +1,17 @@
 import cv2
 import numpy as np
 
-BGRImage = cv2.imread("images project1/yellow.jpeg")
-r = np.sqrt(((BGRImage.shape[0]/2.0)**2.0)+((BGRImage.shape[1]/2.0)**2.0))
+BGRImage_Y = cv2.imread("images project1/yellow.jpeg")
 
-polar_image = cv2.linearPolar(BGRImage, (BGRImage.shape[0] / 2, BGRImage.shape[1] / 2), r, cv2.WARP_FILL_OUTLIERS)
-cv2.imshow('polar coordinates', polar_image)
+
+def polar_cordinates(img):
+    r = np.sqrt(((img.shape[0] / 2.0) ** 2.0) + ((img.shape[1] / 2.0) ** 2.0))
+    polar_image = cv2.linearPolar(img, (img.shape[0] / 2, img.shape[1] / 2), r, cv2.WARP_FILL_OUTLIERS)
+    return polar_image
+
+
+polar_image_Y = polar_cordinates(BGRImage_Y)
+cv2.imshow('polar coordinates', polar_image_Y)
 
 
 
