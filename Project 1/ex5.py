@@ -15,6 +15,9 @@ X = np.linspace(0, 1, row)
 Y = np.linspace(0, 1, col)
 iman = im2double(ima_gray) + np.multiply(np.cos(32*np.pi * X), 0.25)
 
+ftimage = np.fft.fft2(iman)
+ftimage = np.fft.fftshift(ftimage)
+psd2D = np.abs( ftimage )**2
 # cv2.imwrite("images project1/pnois1.jpg", g)
 # f = np.fft.fft2(iman)
 # f1 = np.fft.fftshift(f)

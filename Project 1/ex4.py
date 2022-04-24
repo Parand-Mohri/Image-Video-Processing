@@ -10,6 +10,7 @@ def magnitude_spectrume(img):
     ftimage = np.fft.fft2(imagegray)
     ftimage = np.fft.fftshift(ftimage)
     magnitude_spectrum = 20 * np.log(np.abs(ftimage))
+
     return magnitude_spectrum
 
 

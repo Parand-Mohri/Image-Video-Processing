@@ -3,36 +3,38 @@ import math
 import cv2
 import numpy as np
 
-BGRImage = cv2.imread("images project1/birds.jpg")
-RGBImage = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2RGB)
+BGRImage_B = cv2.imread("images project1/birds.jpg")
+RGBImage_B = cv2.cvtColor(BGRImage_B, cv2.COLOR_BGR2RGB)
+
+BGRImage_S = cv2.imread("images project1/stone.jpg")
+RGBImage_S = cv2.cvtColor(BGRImage_S, cv2.COLOR_BGR2RGB)
+
 # Part 1 --> using build in function to get HSV
-HSVImage = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2HSV)
-
-# Part 2 --> calculating HSI by hand
-rgb = np.float32(RGBImage)/255
-R = rgb[:, :, 0]
-G = rgb[:, :, 1]
-B = rgb[:, :, 2]
-
-# nominator = np.multiply(0.5, ((R - G) + (R - B)))
-# denominator = np.sqrt(((R - G) * (R - G)) + ((R - B) * (G - B)))
-# H = np.arccos(nominator / (denominator + 0.001))
-# if B.all() > G.all():
-#     H = 360 - H
-#
-# H = H / 360
-# S = 1 - (3 / ((R + G + B) + 0.001)) * np.minimum(np.minimum(R, G), B)
-I = np.divide((R + G + B), 3)
-
-# HSI = cv2.merge((H, S, I))
+HSVImage_B = cv2.cvtColor(BGRImage_B, cv2.COLOR_BGR2HSV)
+HSVImage_S = cv2.cvtColor(BGRImage_S, cv2.COLOR_BGR2HSV)
 
 
-# Part 2 --> find V from HSV
-V = np.maximum(np.maximum(R, G), B)
+# Part 2 --> find I from HSI
+def find_I_V(RGBImage):
+    rgb = np.float32(RGBImage) / 255
+    R = rgb[:, :, 0]
+    G = rgb[:, :, 1]
+    B = rgb[:, :, 2]
+    I = np.divide((R + G + B), 3)
+    V = np.maximum(np.maximum(R, G), B)
+    return I, V
 
-cv2.imshow('Original image', BGRImage)
-cv2.imshow('HSV image', HSVImage)
-cv2.imshow('HSI image', I)
-cv2.imshow('V', V)
+
+I_B, V_B = find_I_V(RGBImage_B)
+I_S, V_S = find_I_V(RGBImage_S)
+
+cv2.imshow('Original Bird image', BGRImage_B)
+cv2.imshow('Original Stone image', BGRImage_S)
+cv2.imshow('HSV Bird image', HSVImage_B)
+cv2.imshow('HSV Stone image', HSVImage_S)
+cv2.imshow('I Bird image', I_B)
+cv2.imshow('I Stone image', I_S)
+cv2.imshow('V Bird image', V_B)
+cv2.imshow('V Stone image', V_S)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
