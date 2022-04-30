@@ -6,8 +6,8 @@ BGRImage = cv2.imread("images project1/pink.jpg")
 
 
 def magnitude_spectrume(img):
-    imagegray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    ftimage = np.fft.fft2(imagegray)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ftimage = np.fft.fft2(img)
     ftimage = np.fft.fftshift(ftimage)
     magnitude_spectrum = 20 * np.log(np.abs(ftimage))
 
@@ -28,7 +28,7 @@ plt.imshow(magnitude_spectrum_padding, cmap='gray')
 plt.title('Magnitude Spectrum padding')
 plt.show()
 
-cv2.imshow("paddinh", padding)
+cv2.imshow("padding", padding)
 cv2.imshow("original", BGRImage)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

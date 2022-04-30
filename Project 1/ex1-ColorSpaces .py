@@ -20,7 +20,6 @@ def find_I_V(RGBImage):
     B = rgb[:, :, 2]
     I = np.divide((R + G + B), 3)
     V = np.maximum(np.maximum(R, G), B)
-    print(V)
     return I, V
 
 
@@ -35,12 +34,12 @@ cv2.imshow('Original Bird image', BGRImage_B)
 cv2.imshow('R', R)
 cv2.imshow('G', G)
 cv2.imshow('B', B)
-# cv2.imshow('Original Stone image', BGRImage_S)
+cv2.imshow('Original Stone image', BGRImage_S)
 cv2.imshow('HSV Bird image', HSVImage_B)
-# cv2.imshow('HSV Stone image', HSVImage_S)
+cv2.imshow('HSV Stone image', HSVImage_S)
 cv2.imshow('I Bird image', I_B)
-# cv2.imshow('I Stone image', I_S)
+cv2.imshow('I Stone image', I_S)
 cv2.imshow('V Bird image', V_B)
-# cv2.imshow('V Stone image', V_S)
+cv2.imshow('V Stone image', V_S)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
