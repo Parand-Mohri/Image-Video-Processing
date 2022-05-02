@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 
 BGRImage = cv2.imread("images project1/pink.jpg")
 
-
+# method for finding magnitude spectrum
 def magnitude_spectrume(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     ftimage = np.fft.fft2(img)
@@ -14,6 +14,7 @@ def magnitude_spectrume(img):
     return magnitude_spectrum
 
 
+# add padding to image
 padding = np.pad(BGRImage, ((0, 0), (300, 0), (0, 0)),
                  mode='constant')
 
