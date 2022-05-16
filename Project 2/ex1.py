@@ -1,5 +1,3 @@
-import math
-
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,7 +13,7 @@ u = 2 * u / n2
 v = 2 * v / n1
 F = np.fft.fft2(RGBImage)
 a = 0.1
-b = 0.2
+b = 0.1
 H = np.sinc((u * a + v * b)) * np.exp(-1j * np.pi * (u * a + v * b))
 G = F
 G[:, :, 0] = np.multiply(F[:, :, 0], H)
@@ -37,9 +35,6 @@ plt.show()
 
 
 # R1 = G
-# R1 = F + (1/H)
-
-
 # dh = np.abs(H) ** 2
 # Hw = np.conj(H) / dh
 # Wiener filtered motion blurred image
@@ -61,14 +56,42 @@ plt.imshow(rx2)
 plt.show()
 
 
+#Sn(u,v)/Sf(u,v) is zero because we are only doing for blur image
+dh = np.abs(H) ** 2
+Hw = np.conj(H) / dh
+R3 = G
+R3[:, :, 0] = np.multiply(Hw, G[:,:,0])
+R3[:, :, 1] = np.multiply(Hw, G[:,:,1])
+R3[:, :, 2] = np.multiply(Hw, G[:,:,2])
+rx3 = np.abs(np.fft.ifft2(R3)) / 255
+plt.imshow(rx3)
+plt.show()
 
-# Fn = np.fft.fft2(xn)
-# nn = RGBImage - xn
-# snn = abs(np.fft.fft2(nn)) ** 2
-# sxx = abs(np.fft.fft2(RGBImage)) ** 2
-# dh = np.abs(H) ** 2 + snn / sxx
-# Hw = np.conj(H) / dh
-# # R2 = Hw * Fn
+Fn = np.fft.fft2(xn)
+nn = RGBImage - xn
+snn = abs(np.fft.fft2(nn)) ** 2
+sxx = abs(np.fft.fft2(RGBImage)) ** 2
+K = np.mean(snn / sxx)
+# print(np.mean(snn / sxx))
+# print(np.average(snn / sxx))
+dh1 = np.abs(H) ** 2
+# dh1[:,:,0] = (np.abs(H) ** 2) + (snn[:,:,0] / sxx[:,:,0])
+# dh1[:,:,1] = (np.abs(H) ** 2 )+ snn[:,:,1] / sxx[:,:,1]
+# dh1[:,:,2] = (np.abs(H) ** 2 )+ (snn[:,:,2] / sxx[:,:,2])
+Hw1 = np.conj(H) / dh1
+# Hw1[:,:,0] = np.conj(H) / dh1[:,:,0]
+# Hw1[:,:,1] = np.conj(H) / dh1[:,:,1]
+# Hw1[:,:,2] = np.conj(H) / dh1[:,:,2]
+R4 = Fn
+R4[:, :, 0] = np.multiply(Hw1, Fn[:,:,0])
+R4[:, :, 1] = np.multiply(Hw1, Fn[:,:,1])
+R4[:, :, 2] = np.multiply(Hw1, Fn[:,:,2])
+rx4 = np.abs(np.fft.ifft2(R4)) / 255
+plt.imshow(rx4)
+plt.show()
+
+
+# R2 = Hw * Fn
 # R2 = G
 # R2[:, :, 0] = np.multiply(Fn[:, :, 0], Hw)
 # R2[:, :, 1] = np.multiply(Fn[:, :, 1], Hw)
