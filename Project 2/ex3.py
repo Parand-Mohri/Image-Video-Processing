@@ -4,6 +4,18 @@ import matplotlib.pyplot as plt
 from skimage.measure import regionprops
 from skimage.measure import label
 
+
+def open(image, kernel):
+    eroded = cv2.erode(image, kernel)
+    dilated = cv2.dilate(eroded, kernel)
+    return dilated
+
+
+def close(image, kernel):
+    dilated = cv2.dilate(image, kernel)
+    eroded = cv2.erode(dilated, kernel)
+    return eroded
+
 oranges = cv2.imread("images project 2/oranges.jpg")
 orangesTree = cv2.imread("images project 2/orangetree.jpg")
 RGBImage1 = cv2.cvtColor(oranges, cv2.COLOR_BGR2RGB)
@@ -15,8 +27,8 @@ grey2= cv2.cvtColor(RGBImage2, cv2.COLOR_RGB2GRAY)
 (x, y2) = cv2.threshold(grey2, 127, 255, cv2.THRESH_BINARY)
 
 kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(7,7))
-opening = cv2.morphologyEx(y1, cv2.MORPH_OPEN, kernel)
-closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
+opening = open(y2, kernel)
+closing = close(opening, kernel)
 label_im = label(closing)
 regions = regionprops(label_im)
 masks = []
