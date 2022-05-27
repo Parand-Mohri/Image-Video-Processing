@@ -5,90 +5,106 @@ import numpy as np
 
 
 def getDataMatrix(variations):
-    dataMatrix = np.matrix([img.flatten() for img in variations])
-    return dataMatrix
+    # make all images a row and add it to a matrix and return
+    data_matrix = np.matrix([img.flatten() for img in variations])
+    return data_matrix
 
 
-def findEigVMean(variations):
+def findEigVMean(data_matrix):
     # calculating covariance matrix and output eigenvalues and eigenvectors of the latter
-    mean, eigenVectors = cv2.PCACompute(getDataMatrix(variations), mean=None)
-    return mean, eigenVectors
+    mean, eigen_vec = cv2.PCACompute(data_matrix, mean=None)
+    return mean, eigen_vec
 
 
-def findEigFaces(variations):
-    # get eigenfaces from eigen values
-    mean, eigenVectors = findEigVMean(variations)
-    print(eigenVectors.shape)
-    eigenFaces = []
-    # eig = eigenVectors[0].reshape(6000, 4000, 3)
-    for i in range(eigenVectors.shape[0]):
-        eig = eigenVectors[i].reshape(6000, 4000, 3)
-        eigenFaces.append(eig)
-    return eigenFaces
+def findEigFaces(eigen_vec):
+    # get eigen faces from eigen vectors
+    eigen_faces = []
+    for i in range(eigen_vec.shape[0]):
+        eig = eigen_vec[i].reshape(6000, 4000, 3)
+        eigen_faces.append(eig)
+    return eigen_faces
 
 
-def getAvgFace(variations):
-    mean, e = findEigVMean(variations)
-    avgFace = mean.astype(np.uint8).reshape((6000, 4000, 3))
-    return avgFace
+def getAvgFace(mean):
+    # calculate average face from mean
+    avg_face = mean.astype(np.uint8).reshape((6000, 4000, 3))
+    return avg_face
 
 
-def getWeight(img, eigvec, mean):
+# teacher formula
+# def getWeight(img, eig_vec, mean):
+#     # calculate the weight for each image
+#     img = np.squeeze(np.asarray(img), axis=0)
+#     weight = (img * eig_vec) + (img * mean)
+#     return weight
+
+
+# website formula
+def getWeight(img, mean):
+    # calculate the weight for each image
     img = np.squeeze(np.asarray(img), axis=0)
-    weight = (img * eigvec) + (img * mean)
+    m = img - mean
+    weight = img*m
     return weight
 
 
-def getWeights(variations):
-    dataMatrix = getDataMatrix(variations)
-    mean, eigVect = findEigVMean(variations)
+# def getWeights(data_matrix, eig_vec, mean):
+#     # calculate all the weights
+#     weights = []
+#     for i in range(data_matrix.shape[0]):
+#         weights.append(getWeight(data_matrix[i], eig_vec[i], mean))
+#     return weights
+
+
+def getWeights(data_matrix, mean):
+    # calculate all the weights
     weights = []
-    for i in range(dataMatrix.shape[0]):
-        weights.append(getWeight(dataMatrix[i], eigVect[i], mean))
+    for i in range(data_matrix.shape[0]):
+        weights.append(getWeight(data_matrix[i], mean))
     return weights
 
 
 def reconstructImage(variations):
-    weights = getWeights(variations)
-    # eigFaces = findEigFaces(variations)
-    mean, eigVec = findEigVMean(variations)
-    s_eigfaces = eigVec * weights
+    # make new image given variations
+    data_matrix = getDataMatrix(variations)
+    mean, eig_vec = findEigVMean(data_matrix)
+    # weights = getWeights(data_matrix, eig_vec, mean)
+    weights = getWeights(data_matrix, mean)
+    s_eig_faces = eig_vec * weights
+    s_eig_faces = s_eig_faces.sum()
+    new_face = s_eig_faces + getAvgFace(mean)
+    return new_face.astype(np.uint8).reshape((6000, 4000, 3))
+
+
+def reconstructImageDif(variations1, variations2):
+    data_matrix_one = getDataMatrix(variations1)
+    data_matrix_two = getDataMatrix(variations2)
+    mean, x = findEigVMean(data_matrix_one)
+    y, eig_vec = findEigVMean(data_matrix_two)
+    weights = getWeights(data_matrix_one, mean)
+    s_eigfaces = eig_vec * weights
     s_eigfaces = s_eigfaces.sum()
-    newFace = s_eigfaces + getAvgFace(variations)
+    newFace = s_eigfaces + getAvgFace(mean)
     return newFace.astype(np.uint8).reshape((6000, 4000, 3))
-
-
-
-# def reconstructImage(variations1, variations2):
-#     mean, x = findEigVMean(variations1)
-#     y, eigVec = findEigVMean(variations2)
-#     s_eigfaces = eigVec * weights
-#     s_eigfaces = s_eigfaces.sum()
-#     newFace = s_eigfaces + getAvgFace(variations)
-#     return newFace.astype(np.uint8).reshape((6000, 4000, 3))
 
 
 variation_K = []
 for img in glob.glob("images project 2/ex4_Images/im_K/*.JPG"):
     variation_K.append(cv2.imread(img))
 
-variation_K_Some = [variation_K[0], variation_K[1]]
-# mean,eigenFace_K = findEigFacesMean(variation_K)
+variation_O = []
+for img in glob.glob("images project 2/ex4_Images/im_O/*.JPG"):
+    variation_O.append(cv2.imread(img))
 
-# weights =
+variation_W = []
+for img in glob.glob("images project 2/ex4_Images/im_W/*.JPG"):
+    variation_W.append(cv2.imread(img))
 
 
-# making a new face
-# img = avgFace + np.sum(eigenFaces)
-# img = getAvgFace([rowImage_K, rowImage_O, rowImage_W])
-# img = getAvgFace(variation_K)
-# img1 = mean.astype(np.uint8).reshape((6000, 4000, 3))
-# cv2.imshow("Image1", img)
-# eigF = findEigFaces(variation_K)
-# print(len(eigF))
-# img1 = reconstructImageAllEig(variation_K)
-img2 = reconstructImage(variation_K)
+
+# variation_K_Some = [variation_K[0], variation_K[1]]
+# img2 = reconstructImageDif(variation_O, variation_W)
 # cv2.imshow("Image1", img1)
-cv2.imshow("Image2", img2)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.imshow("Image2", img2)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
