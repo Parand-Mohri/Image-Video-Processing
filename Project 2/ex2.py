@@ -7,9 +7,9 @@ from numpy import r_
 import matplotlib.pyplot as plt
 from numpy import pi
 
-BGRImage = cv2.imread("images project 2/bird.jpg")
+BGRImage = cv2.imread("images project 2/bird.jpg",0)
 # RGBImage = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2RGB).astype(np.double)
-img = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2GRAY)
+# img = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2GRAY)
 
 
 def magnitude_spectrume(img):
@@ -21,7 +21,7 @@ def magnitude_spectrume(img):
 
 
 def dct2(a):
-    return scipy.fftpack.dct(scipy.fftpack.dct( a.T, norm='ortho' ).T, norm='ortho' )
+    return scipy.fftpack.dct(scipy.fftpack.dct(a.T, norm='ortho' ).T, norm='ortho' )
 
 
 def idct2(a):

@@ -91,7 +91,7 @@ plt.imshow(rx4)
 plt.show()
 
 
-# R2 = Hw * Fn
+# R2 = Hw *
 # R2 = G
 # R2[:, :, 0] = np.multiply(Fn[:, :, 0], Hw)
 # R2[:, :, 1] = np.multiply(Fn[:, :, 1], Hw)

@@ -19,7 +19,7 @@ def close(image, kernel):
 
 
 def countCircles(img):
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
     opening = open(img, kernel)
     closing = close(opening, kernel)
     label_im = label(closing)
@@ -62,8 +62,7 @@ opening = open(grey3, kernel)
 closing = close(opening, kernel)
 counting = np.zeros(109)
 for i in range(1,110):
-    circles = cv2.HoughCircles(closing,cv2.HOUGH_GRADIENT,1.5,1,
-                            param1=50,param2=30,minRadius=i,maxRadius=i)
+    circles = cv2.HoughCircles(closing,cv2.HOUGH_GRADIENT, 1.5, 1 , param1=50,param2=30,minRadius=i,maxRadius=i)
     if circles is not None:
         counting[i-1] = circles[0].size / 3
 
