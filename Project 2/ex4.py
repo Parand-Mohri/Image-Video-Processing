@@ -1,3 +1,5 @@
+import glob
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -5,42 +7,46 @@ from numpy.linalg import eig
 from skimage.util import random_noise
 
 
-def resizeImage(img,scale):
-    width = int(img.shape[1] * scale / 100)
-    height = int(img.shape[0] * scale / 100)
-    dim = (width, height)
-
-    # resize image
-    return cv2.resize(img, dim)
+def getDataMatrix(variations):
+    dataMatrix = np.matrix([img.flatten() for img in variations])
+    return dataMatrix
 
 
-# BGRImage_O = cv2.imread("images project 2/old1.jpg")
-# BGRImage_O = resizeImage(BGRImage_O, 115.75)
-BGRImage_O = cv2.imread("images project 2/Picture1.jpg")
-cv2.imwrite("images project 2/Picture1.jpg", BGRImage_O)
-BGRImage_K = cv2.imread("images project 2/kid1.jpg")
-BGRImage_W = cv2.imread("images project 2/woman2.jpg")
-rowImage_O = BGRImage_O.flatten()
-rowImage_W = BGRImage_W.flatten()
-rowImage_K = BGRImage_K.flatten()
-dataMatrix = np.matrix([rowImage_K,rowImage_O,rowImage_W])
-avgRowImage =np.array(np.round_(dataMatrix.sum(axis=0)/3).astype(np.uint8))
+def findEigVV(variations):
+    # calculating covariance matrix and output eigenvalues and eigenvectors of the latter
+    eigenValues, eigenVectors = cv2.PCACompute(getDataMatrix(variations), mean=None)
+    return eigenValues, eigenVectors
 
-# calculating covariance matrix and output eigenvalues and eigenvectors of the latter
-eigenValues, eigenVectors = cv2.PCACompute(dataMatrix, mean=None)
-img1 = avgRowImage + eigenVectors.sum(axis=0).astype(np.uint8)
-print(rowImage_O.size)
-print(avgRowImage.size)
-img = img1.reshape((6000, 4000, 3))
-# print(rowImage_O.shape)
-# print(BGRImage_W.shape)
-# img = img1.reshape((6000, 4000, 3))
 
-# print(img1.shape)
+def findEigFaces(variations):
+    # get eigenfaces from eigen values
+    eigenValues, eigenVectors = findEigVV(variations)
+    eigenFaces = [eig.reshape(6000, 4000, 3) for eig in eigenVectors]
+    return eigenFaces
 
-# cv2.imshow("old", BGRImage_O)
-# cv2.imshow("woman", BGRImage_W)
-# cv2.imshow("Kid", BGRImage_K)
-cv2.imshow("Image1", img)
+
+def getAvgFace(variations):
+    dataMatrix = getDataMatrix(variations)
+    avgRowImage = np.array(np.round_(dataMatrix.sum(axis=0) / dataMatrix.shape[0]).astype(np.uint8))
+    avgFace = avgRowImage.reshape((6000, 4000, 3))
+    return avgFace
+
+
+variation_K = []
+for img in glob.glob("images project 2/ex4_Images/im_K/*.JPG"):
+    variation_K.append(cv2.imread(img))
+
+eigenFace_K = findEigFaces(variation_K)
+
+
+# weights =
+
+
+# making a new face
+# img = avgFace + np.sum(eigenFaces)
+# img = getAvgFace([rowImage_K, rowImage_O, rowImage_W])
+img = getAvgFace(variation_K)
+# cv2.imshow("Image1", avgFace)
+cv2.imshow("Image2", img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
