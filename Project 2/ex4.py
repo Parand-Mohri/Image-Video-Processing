@@ -14,15 +14,17 @@ def resizeImage(img,scale):
     return cv2.resize(img, dim)
 
 
-BGRImage_O = cv2.imread("images project 2/old1.jpg")
-BGRImage_O = resizeImage(BGRImage_O, 115.75)
+# BGRImage_O = cv2.imread("images project 2/old1.jpg")
+# BGRImage_O = resizeImage(BGRImage_O, 115.75)
+BGRImage_O = cv2.imread("images project 2/Picture1.jpg")
+cv2.imwrite("images project 2/Picture1.jpg", BGRImage_O)
 BGRImage_K = cv2.imread("images project 2/kid1.jpg")
 BGRImage_W = cv2.imread("images project 2/woman2.jpg")
 rowImage_O = BGRImage_O.flatten()
 rowImage_W = BGRImage_W.flatten()
 rowImage_K = BGRImage_K.flatten()
 dataMatrix = np.matrix([rowImage_K,rowImage_O,rowImage_W])
-avgRowImage =np.array( np.round_(dataMatrix.sum(axis=0)/3).astype(np.uint8))
+avgRowImage =np.array(np.round_(dataMatrix.sum(axis=0)/3).astype(np.uint8))
 
 # calculating covariance matrix and output eigenvalues and eigenvectors of the latter
 eigenValues, eigenVectors = cv2.PCACompute(dataMatrix, mean=None)
