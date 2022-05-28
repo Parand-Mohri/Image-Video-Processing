@@ -53,8 +53,6 @@ def reconstructImage(variations):
     data_matrix = getDataMatrix(variations)
     mean, eig_vec = findEigVMean(data_matrix)
     weights = getWeights(data_matrix, eig_vec, mean)
-    # weights = getWeights(data_matrix, mean)
-    # output = getAvgFace(mean)
     s_eig_faces = eig_vec * weights
     s_eig_faces = s_eig_faces.sum()
     new_face = s_eig_faces + mean
