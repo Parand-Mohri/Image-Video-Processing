@@ -31,36 +31,20 @@ def getAvgFace(mean):
     return avg_face
 
 
-# teacher formula
-# def getWeight(img, eig_vec, mean):
-#     # calculate the weight for each image
-#     img = np.squeeze(np.asarray(img), axis=0)
-#     weight = (img * eig_vec) + (img * mean)
-#     return weight
-
-
 # website formula
-def getWeight(img, mean):
+def getWeight(img, eig_vec, mean):
     # calculate the weight for each image
     img = np.squeeze(np.asarray(img), axis=0)
     m = img - mean
-    weight = img*m
+    weight = np.dot(m, eig_vec)
     return weight
 
 
-# def getWeights(data_matrix, eig_vec, mean):
-#     # calculate all the weights
-#     weights = []
-#     for i in range(data_matrix.shape[0]):
-#         weights.append(getWeight(data_matrix[i], eig_vec[i], mean))
-#     return weights
-
-
-def getWeights(data_matrix, mean):
+def getWeights(data_matrix, eig_vec, mean):
     # calculate all the weights
     weights = []
     for i in range(data_matrix.shape[0]):
-        weights.append(getWeight(data_matrix[i], mean))
+        weights.append(getWeight(data_matrix[i], eig_vec[i], mean))
     return weights
 
 
@@ -68,11 +52,12 @@ def reconstructImage(variations):
     # make new image given variations
     data_matrix = getDataMatrix(variations)
     mean, eig_vec = findEigVMean(data_matrix)
-    # weights = getWeights(data_matrix, eig_vec, mean)
-    weights = getWeights(data_matrix, mean)
+    weights = getWeights(data_matrix, eig_vec, mean)
+    # weights = getWeights(data_matrix, mean)
+    # output = getAvgFace(mean)
     s_eig_faces = eig_vec * weights
     s_eig_faces = s_eig_faces.sum()
-    new_face = s_eig_faces + getAvgFace(mean)
+    new_face = s_eig_faces + mean
     return new_face.astype(np.uint8).reshape((6000, 4000, 3))
 
 
@@ -101,10 +86,10 @@ for img in glob.glob("images project 2/ex4_Images/im_W/*.JPG"):
     variation_W.append(cv2.imread(img))
 
 
-
-# variation_K_Some = [variation_K[0], variation_K[1]]
-# img2 = reconstructImageDif(variation_O, variation_W)
-# cv2.imshow("Image1", img1)
-# cv2.imshow("Image2", img2)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+variation_K_Some = [variation_K[0], variation_K[1]]
+img2 = reconstructImage(variation_K_Some)
+img1 = reconstructImage(variation_K)
+cv2.imshow("Image1", img1)
+cv2.imshow("Image2", img2)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
