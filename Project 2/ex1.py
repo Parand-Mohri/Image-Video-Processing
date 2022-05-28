@@ -25,13 +25,24 @@ def addBlur(img, a, b):
     g3 = np.abs(np.fft.ifft2(G3))
     g = cv2.merge((g1,g2,g3))
     # return new image
-    return g / np.max(g)
+    return g
 
+
+def addNoise(img, mean, var):
+    # add guassian nois to image with given mean and var
+    xn = random_noise(abs(img).astype(np.uint8), 'gaussian', mean=mean, var=var).astype(np.double)
+    return xn
 
 
 BGRImage = cv2.imread("images project 2/bird.jpg")
 RGBImage = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2RGB).astype(np.double)
-grey = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2GRAY).astype(np.double)
+# grey = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2GRAY).astype(np.double)
+blur = addBlur(RGBImage, 10, 10)
+noise = addNoise(blur, 0, 0.09)
+plt.imshow(blur/255)
+plt.show()
+plt.imshow(noise)
+plt.show()
 
 
 # [u, v] = np.mgrid[-n2 / 2:n2 / 2, -n1 / 2:n1 / 2]
@@ -45,12 +56,11 @@ grey = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2GRAY).astype(np.double)
 # b = 0
 
 
-plt.imshow(addBlur(RGBImage,10,10))
+
 # plt.imshow(abs(g), cmap='gray')
-plt.show()
 
 # gaussian = np.random.normal(0, math.sqrt(0.002), RGBImage.shape)
-# xn = random_noise(np.abs(g).astype(np.uint8), 'gaussian', mean=0, var=0.002).astype(np.double)
+
 # plt.imshow(xn)
 # plt.show()
 # GGGGG = np.fft.fft2(gaussian)
