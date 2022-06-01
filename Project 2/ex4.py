@@ -64,10 +64,10 @@ def reconstructImageDif(variations1, variations2):
     data_matrix_two = getDataMatrix(variations2)
     mean, x = findEigVMean(data_matrix_one)
     y, eig_vec = findEigVMean(data_matrix_two)
-    weights = getWeights(data_matrix_one, mean)
+    weights = getWeights(data_matrix_two, eig_vec, mean)
     s_eigfaces = eig_vec * weights
     s_eigfaces = s_eigfaces.sum()
-    newFace = s_eigfaces + getAvgFace(mean)
+    newFace = s_eigfaces + mean
     return newFace.astype(np.uint8).reshape((6000, 4000, 3))
 
 
@@ -85,9 +85,9 @@ for img in glob.glob("images project 2/ex4_Images/im_W/*.JPG"):
 
 
 variation_K_Some = [variation_K[0], variation_K[1]]
-img2 = reconstructImage(variation_K_Some)
-img1 = reconstructImage(variation_K)
+# img2 = reconstructImage(variation_K_Some)
+img1 = reconstructImageDif(variation_K, variation_O)
 cv2.imshow("Image1", img1)
-cv2.imshow("Image2", img2)
+# cv2.imshow("Image2", img2)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
