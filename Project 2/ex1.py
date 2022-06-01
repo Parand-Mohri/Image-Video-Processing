@@ -4,18 +4,21 @@ import matplotlib.pyplot as plt
 from skimage.util import random_noise
 
 
-# add blur to image given a and b and remove the blur using inverse filtering
-def addAndRemoveBlur(img, a, b):
+def getH(img, a, b):
     n2, n1, n0 = img.shape
     [u, v] = np.mgrid[-round(n2 / 2):round(n2 / 2), -round(n1 / 2):round(n1 / 2)]
     u = 2 * u / n2
     v = 2 * v / n1
+    # H given for adding blur
+    H = np.sinc((u * a + v * b)) * np.exp(-1j * np.pi * (u * a + v * b))
+    return H
+
+# add blur to image given a and b and remove the blur using inverse filtering
+def addAndRemoveBlur(img,H):
     # calculate the forier transform of each chanel
     F1 = np.fft.fftshift(np.fft.fft2(img[:, :, 0]))
     F2 = np.fft.fftshift(np.fft.fft2(img[:, :, 1]))
     F3 = np.fft.fftshift(np.fft.fft2(img[:, :, 2]))
-    # H given for adding blur
-    H = np.sinc((u * a + v * b)) * np.exp(-1j * np.pi * (u * a + v * b))
     # add the blur function to FFT of image
     G1 = F1 * H
     G2 = F2 * H
@@ -31,28 +34,86 @@ def addAndRemoveBlur(img, a, b):
     d2 = np.abs(np.fft.ifft2(D2))
     d3 = np.abs(np.fft.ifft2(D3))
     g = cv2.merge((g1, g2, g3))
-    d = cv2.merge((d1,d2,d3))
+    d = cv2.merge((d1, d2, d3))
     # return blur and de_blur image
     return g, d
 
 
-def addNoise(img, mean, var):
+def addNoise(img, mean, var, H):
     # add guassian nois to image with given mean and var
-    xn = random_noise(img.astype(np.uint8), 'gaussian', mean=mean, var=var).astype(np.double)
-    return xn
+    xn = random_noise(abs(img).astype(np.uint8), 'gaussian', mean=mean, var=var).astype(np.double)
+    # Fn = np.fft.fft2(xn)
+    F1 = np.fft.fftshift(np.fft.fft2(xn[:, :, 0]))
+    F2 = np.fft.fftshift(np.fft.fft2(xn[:, :, 1]))
+    F3 = np.fft.fftshift(np.fft.fft2(xn[:, :, 2]))
+    D1 = F1 / H
+    D2 = F2 / H
+    D3 = F3 / H
+    d1 = np.abs(np.fft.ifft2(D1))
+    d2 = np.abs(np.fft.ifft2(D2))
+    d3 = np.abs(np.fft.ifft2(D3))
+    d = cv2.merge((d1,d2,d3))
+    return xn, d
+
+def MMSE(original_img, noisy_img):
+    # F= np.fft.fftshift(np.fft.fft2(original_img))
+    G1 = np.fft.fft2(noisy_img[:, :, 0])
+    G2 = np.fft.fft2(noisy_img[:, :, 1])
+    G3 = np.fft.fft2(noisy_img[:, :, 2])
+    F1 = np.fft.fft2(original_img[:, :, 0])
+    F2 = np.fft.fft2(original_img[:, :, 1])
+    F3 = np.fft.fft2(original_img[:, :, 2])
+    nn = original_img - noisy_img
+    HH1 = np.divide(abs(np.fft.fft2(nn[:, :, 0])), abs(F1))
+    HH2 = np.divide(abs(np.fft.fft2(nn[:, :, 1])), abs(F2))
+    HH3 = np.divide(abs(np.fft.fft2(nn[:, :, 2])), abs(F3))
+    # HH1 =np.divide(abs(np.fft.fft2(nn[:, :, 0])),  abs(np.fft.fft2(original_img[:, :, 0])))
+    # HH2 = np.divide(abs(np.fft.fft2(nn[:, :, 1])),  abs(np.fft.fft2(original_img[:, :, 1])))
+    # HH3 = np.divide(abs(np.fft.fft2(nn[:, :, 2])),  abs(np.fft.fft2(original_img[:, :, 2])))
+    snn1 = abs(np.fft.fft2(nn[:, :, 0])) ** 2
+    snn2 = abs(np.fft.fft2(nn[:, :, 1])) ** 2
+    snn3 = abs(np.fft.fft2(nn[:, :, 2])) ** 2
+    sxx1 = abs(np.fft.fft2(original_img[:, :, 0])) ** 2
+    sxx2 = abs(np.fft.fft2(original_img[:, :, 1])) ** 2
+    sxx3 = abs(np.fft.fft2(original_img[:, :, 2])) ** 2
+    dh1 = np.abs(HH1) ** 2 + snn1 / sxx1
+    dh2 = np.abs(HH2) ** 2 + snn2 / sxx2
+    dh3 = np.abs(HH3) ** 2 + snn3 / sxx3
+    # Hw1 = np.abs(HH1) ** 2 / dh1
+    # Hw2 = np.abs(HH2) ** 2 / dh2
+    # Hw3 = np.abs(HH3) ** 2 / dh3
+    Hw1 = np.conj(HH1) / dh1
+    Hw2 = np.conj(HH2) / dh2
+    Hw3 = np.conj(HH3) / dh3
+    R1 = Hw1 * G1
+    R2 = Hw2 * G2
+    R3 = Hw3 * G3
+    d1 = np.abs(np.fft.ifft2(R1))
+    d2 = np.abs(np.fft.ifft2(R2))
+    d3 = np.abs(np.fft.ifft2(R3))
+    d = cv2.merge((d1,d2,d3))
+    return d
 
 
 BGRImage = cv2.imread("images project 2/bird.jpg")
 RGBImage = cv2.cvtColor(BGRImage, cv2.COLOR_BGR2RGB).astype(np.double)
 # numbers are chosen here to blur and noisy the image but enough for image to be visible
-blur, de_blur = addAndRemoveBlur(BGRImage, 9, 3)  # only blur and de_blured
-noise = addNoise(BGRImage, 0, 1)  # only noisy
-noise_blur = addNoise(blur, 0, 0.09)  # blur and noisy
-cv2.imshow("blur", blur/np.max(blur))
-cv2.imshow("de_blur", de_blur/np.max(de_blur))
+H = getH(BGRImage, 0.9,0.8)
+blur, de_blur = addAndRemoveBlur(BGRImage, H)  # only blur and de_blured
+# de_blur = inverse_filtering(blur, H)
+noise, x = addNoise(BGRImage, 0, 0.009, H)  # only noisy
+# noise_blur, denoised = addNoise(blur, 0, 0.009, H)  # blur and noisy
+denoised = MMSE(BGRImage, noise)
+# cv2.imshow("blur", blur/np.max(blur))
+# cv2.imshow("de_blur", de_blur/np.max(de_blur))
+# cv2.imshow("denoised", denoised/np.max(denoised))
+cv2.imshow("noised", noise)
+cv2.imshow("denoised", denoised)
 cv2.imshow("original", BGRImage)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+
 # plt.imshow(blur)
 # plt.show()
 # plt.imshow(noise_blur)
