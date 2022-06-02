@@ -42,7 +42,7 @@ d3 = np.abs(np.fft.ifft2(D3))
 d = cv2.merge((d1, d2, d3))
 
 
-l = random_noise(g, 'gaussian', mean=0, var=0.09)
+l = random_noise(g, 'gaussian', mean=0, var=0.03)
 l = cv2.normalize(l, None)
 q1 = np.fft.fftshift(np.fft.fft2(l[:, :, 0]))
 q2 =np.fft.fftshift(np.fft.fft2(l[:, :, 1]))
@@ -59,14 +59,80 @@ p3 = np.abs(np.fft.ifft2(Q3))
 P = cv2.merge((p1, p2, p3))
 
 
-# s = img
-# s = img[:,:,0] + n
-# s = img[:,:,1] + n
-# s = img[:,:,2] + n
+k = random_noise(img, 'gaussian', mean=0, var=0.05)
+k = cv2.normalize(k, None)
+o1 = np.fft.fftshift(np.fft.fft2(k[:, :, 0]))
+o2 =np.fft.fftshift(np.fft.fft2(k[:, :, 1]))
+o3 =np.fft.fftshift(np.fft.fft2(k[:, :, 2]))
+nn = img - k
+snn1 = abs(np.fft.fftshift(np.fft.fft2(nn[:, :, 0]))) ** 2
+snn2 = abs(np.fft.fftshift(np.fft.fft2(nn[:, :, 1]))) ** 2
+snn3 = abs(np.fft.fftshift(np.fft.fft2(nn[:, :, 2]))) ** 2
+sxx1 = abs(F1) ** 2
+sxx2 = abs(F2) ** 2
+sxx3 = abs(F3) ** 2
+I1 = 1
+I2 = 1
+I3 = 1
+dh1 = np.abs(I1) ** 2 + (snn1 / sxx1)
+dh2 = np.abs(I2) ** 2 + (snn2 / sxx2)
+dh3 = np.abs(I3) ** 2 + (snn3 / sxx3)
+Hw1 = np.conj(I1) / dh1
+Hw2 = np.conj(I2) / dh2
+Hw3 = np.conj(I3) / dh3
+R1 = Hw1 * G1
+R2 = Hw2 * G2
+R3 = Hw3 * G3
+a1 = np.abs(np.fft.ifft2(R1))
+a2 = np.abs(np.fft.ifft2(R2))
+a3 = np.abs(np.fft.ifft2(R3))
+A = cv2.merge((a1, a2, a3))
+
+
+# o1 = np.fft.fftshift(np.fft.fft2(k[:, :, 0]))
+# o2 =np.fft.fftshift(np.fft.fft2(k[:, :, 1]))
+# o3 =np.fft.fftshift(np.fft.fft2(k[:, :, 2]))
+nnB = img - l
+xx =np.fft.fftshift(np.fft.fft2(nnB))
+snnB1 = abs(xx) ** 2
+# snnB1 = abs(np.fft.fftshift(np.fft.fft2(nnB[:, :, 0]))) ** 2
+# snnB2 = abs(np.fft.fftshift(np.fft.fft2(nnB[:, :, 1]))) ** 2
+# snnB3 = abs(np.fft.fftshift(np.fft.fft2(nnB[:, :, 2]))) ** 2
+F = np.fft.fftshift(np.fft.fft2(img))
+sxxB1 = abs(F) ** 2
+qq = np.fft.fftshift(np.fft.fft2(l))
+# sxxB2 = abs(F2) ** 2
+# sxxB3 = abs(F3) ** 2
+IB1 = qq / xx
+# IB2 = q2 / F2
+# IB3 = q3 / F3
+K = np.mean((snnB1 / sxxB1))
+dhB1 = np.abs(IB1) ** 2 + K
+# dhB2 = np.abs(IB2) ** 2 + (snnB2 / sxx2)
+# dhB3 = np.abs(IB3) ** 2 + (snnB3 / sxx3)
+HwB1 =  np.conj(IB1)  / dhB1
+
+
+# HwB2 = np.conj(IB2) / dhB2
+# HwB3 = np.conj(IB3) / dhB3
+RB1 = HwB1[:,:,0] * G1
+RB2 = HwB1[:,:,1] * G2
+RB3 = HwB1[:,:,2] * G3
+aB1 = np.abs(np.fft.ifft2(RB1))
+aB2 = np.abs(np.fft.ifft2(RB2))
+aB3 = np.abs(np.fft.ifft2(RB3))
+AB = cv2.merge((aB1, aB2, aB3))
+
+
+
+
 cv2.imshow("blue", g)
 cv2.imshow("deblue", d/np.max(d))
 cv2.imshow("denoise", P/np.max(P))
-cv2.imshow("noise", l/np.max(l))
+cv2.imshow("noise&blur", l/np.max(l))
+cv2.imshow("noise", k/np.max(k))
+cv2.imshow("MMSE", A/np.max(A))
+cv2.imshow("MMSE  B", AB/np.max(AB))
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
