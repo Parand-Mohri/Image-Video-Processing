@@ -59,11 +59,11 @@ p3 = np.abs(np.fft.ifft2(Q3))
 P = cv2.merge((p1, p2, p3))
 
 
-k = random_noise(img, 'gaussian', mean=0, var=0.05)
-k = cv2.normalize(k, None)
+k = random_noise(img, 'gaussian', mean=0, var=0.03)
+# k = cv2.normalize(k, None)
 o1 = np.fft.fftshift(np.fft.fft2(k[:, :, 0]))
-o2 =np.fft.fftshift(np.fft.fft2(k[:, :, 1]))
-o3 =np.fft.fftshift(np.fft.fft2(k[:, :, 2]))
+o2 = np.fft.fftshift(np.fft.fft2(k[:, :, 1]))
+o3 = np.fft.fftshift(np.fft.fft2(k[:, :, 2]))
 nn = img - k
 snn1 = abs(np.fft.fftshift(np.fft.fft2(nn[:, :, 0]))) ** 2
 snn2 = abs(np.fft.fftshift(np.fft.fft2(nn[:, :, 1]))) ** 2
@@ -80,9 +80,9 @@ dh3 = np.abs(I3) ** 2 + (snn3 / sxx3)
 Hw1 = np.conj(I1) / dh1
 Hw2 = np.conj(I2) / dh2
 Hw3 = np.conj(I3) / dh3
-R1 = Hw1 * G1
-R2 = Hw2 * G2
-R3 = Hw3 * G3
+R1 = Hw1 * o1
+R2 = Hw2 * o2
+R3 = Hw3 * o3
 a1 = np.abs(np.fft.ifft2(R1))
 a2 = np.abs(np.fft.ifft2(R2))
 a3 = np.abs(np.fft.ifft2(R3))
@@ -122,8 +122,6 @@ aB1 = np.abs(np.fft.ifft2(RB1))
 aB2 = np.abs(np.fft.ifft2(RB2))
 aB3 = np.abs(np.fft.ifft2(RB3))
 AB = cv2.merge((aB1, aB2, aB3))
-
-
 
 
 cv2.imshow("blue", g)
