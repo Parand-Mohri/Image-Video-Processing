@@ -5,7 +5,7 @@ import numpy as np
 from skimage.measure import regionprops
 from skimage.measure import label
 
-
+# open the image by first doing erotion and then dilation
 def open(image, kernel):
     eroded = cv2.erode(image, kernel)
     dilated = cv2.dilate(eroded, kernel)
@@ -19,9 +19,12 @@ def close(image, kernel):
 
 
 def countCircles(img, x , y , j):
+    # get the ellipse used to open the image
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (x, x))
     opening = open(img, kernel)
+    # label the different naighboring pixels if they have same color
     label_im = label(opening)
+    # count the groups find by label
     regions = regionprops(label_im)
     masks = []
     bbox = []
@@ -29,6 +32,7 @@ def countCircles(img, x , y , j):
     for num, x in enumerate(regions):
         area = x.area
         convex_area = x.convex_area
+        # check the area of the region found and if its area is acceptable by size given count them
         if (num != 0 and (area > 10) and (convex_area / area < y)
                 and (convex_area / area > j)):
             masks.append(regions[num].convex_image)
@@ -45,18 +49,23 @@ RGBImage2 = cv2.cvtColor(orangesTree, cv2.COLOR_BGR2RGB)
 grey1 = cv2.cvtColor(RGBImage1, cv2.COLOR_RGB2GRAY)
 grey2 = cv2.cvtColor(RGBImage2, cv2.COLOR_RGB2GRAY)
 
+# using trshhold given make each pixel balck or white given color
 (x, y1) = cv2.threshold(grey1, 127, 255, cv2.THRESH_BINARY)
 (x, y2) = cv2.threshold(grey2, 127, 255, cv2.THRESH_BINARY)
 
+# count the circles
 orangeIm1 = countCircles(y1, 10, 1.09, 0.9)
 orangeIm2 = countCircles(y2, 40, 1.5, 1.1)
 print(orangeIm1)
 print(orangeIm2)
 
+# part two
 lights = cv2.imread("images project 2/jar.jpg")
 RGBImage3 = cv2.cvtColor(lights, cv2.COLOR_BGR2RGB)
 grey3 = cv2.cvtColor(RGBImage3, cv2.COLOR_RGB2GRAY)
+# using trshhold given make each pixel balck or white given color
 (x, y3) = cv2.threshold(grey3, 127, 255, cv2.THRESH_BINARY)
+# 100 is used to count circles from 1mm to 100mm radius
 size = np.linspace(1, 100, 100)
 intensity = np.zeros(len(size))
 for i in range(len(size)):
