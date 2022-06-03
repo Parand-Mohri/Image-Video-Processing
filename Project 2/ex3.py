@@ -18,11 +18,10 @@ def close(image, kernel):
     return eroded
 
 
-def countCircles(img):
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+def countCircles(img, x , y , j):
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (x, x))
     opening = open(img, kernel)
-    closing = close(opening, kernel)
-    label_im = label(closing)
+    label_im = label(opening)
     regions = regionprops(label_im)
     masks = []
     bbox = []
@@ -30,8 +29,8 @@ def countCircles(img):
     for num, x in enumerate(regions):
         area = x.area
         convex_area = x.convex_area
-        if (num != 0 and (area > 10) and (convex_area / area < 1.06)
-                and (convex_area / area > 0.95)):
+        if (num != 0 and (area > 10) and (convex_area / area < y)
+                and (convex_area / area > j)):
             masks.append(regions[num].convex_image)
             bbox.append(regions[num].bbox)
             list_of_index.append(num)
@@ -49,28 +48,33 @@ grey2 = cv2.cvtColor(RGBImage2, cv2.COLOR_RGB2GRAY)
 (x, y1) = cv2.threshold(grey1, 127, 255, cv2.THRESH_BINARY)
 (x, y2) = cv2.threshold(grey2, 127, 255, cv2.THRESH_BINARY)
 
-orangeIm1 = countCircles(y1)
-orangeIm2 = countCircles(y2)
+orangeIm1 = countCircles(y1, 10, 1.09, 0.9)
+orangeIm2 = countCircles(y2, 40, 1.5, 1.1)
 print(orangeIm1)
 print(orangeIm2)
 
 lights = cv2.imread("images project 2/jar.jpg")
 RGBImage3 = cv2.cvtColor(lights, cv2.COLOR_BGR2RGB)
 grey3 = cv2.cvtColor(RGBImage3, cv2.COLOR_RGB2GRAY)
-kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
-opening = open(grey3, kernel)
-closing = close(opening, kernel)
-counting = np.zeros(109)
-for i in range(1,110):
-    circles = cv2.HoughCircles(closing,cv2.HOUGH_GRADIENT, 1.5, 1 , param1=50,param2=30,minRadius=i,maxRadius=i)
-    if circles is not None:
-        counting[i-1] = circles[0].size / 3
+(x, y3) = cv2.threshold(grey3, 127, 255, cv2.THRESH_BINARY)
+size = np.linspace(1, 100, 100)
+intensity = np.zeros(len(size))
+for i in range(len(size)):
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (i + 1, i + 1))
+    im = open(y3, kernel)
+    # the sum of all intensity pixels is the surface area, as opening is done with bigger ellipse, the intensities computed will be lower
+    intensity[i] = np.sum(im)
 
+# using np gradient to get the derivitive meaning the
+# rate of change of total intensity after opening with different size ellipses
+diff = np.gradient(intensity)
 
-x = np.array(range(109))
-plt.xlabel("Radius of circle")
-plt.ylabel("number of circles")
-plt.plot(x, counting, color = "blue", marker = "o", label = "Array elements")
-plt.legend()
+plt.plot(size, diff, '-bo')
+plt.title('difference in surface area / radius of SE')
 plt.show()
+
+plt.plot(size, intensity)
+plt.title('sum of intensities ')
+plt.show()
+
 
