@@ -52,6 +52,8 @@ def reconstructImage(variations):
     # make new image given variations
     data_matrix = getDataMatrix(variations)
     mean, eig_vec = findEigVMean(data_matrix)
+    # avgface = getAvgFace(mean)
+    # eigenface = findEigFaces(eig_vec)
     weights = getWeights(data_matrix, eig_vec, mean)
     s_eig_faces = eig_vec * weights
     s_eig_faces = s_eig_faces.sum()
@@ -60,11 +62,12 @@ def reconstructImage(variations):
 
 
 def reconstructImageDif(variations1, variations2):
+    #make new image given two variation using the mean of first and eigenvector of second
     data_matrix_one = getDataMatrix(variations1)
     data_matrix_two = getDataMatrix(variations2)
     mean, x = findEigVMean(data_matrix_one)
     y, eig_vec = findEigVMean(data_matrix_two)
-    weights = getWeights(data_matrix_two, eig_vec, mean)
+    weights = getWeights(data_matrix_one, eig_vec, mean)
     s_eigfaces = eig_vec * weights
     s_eigfaces = s_eigfaces.sum()
     newFace = s_eigfaces + mean
@@ -85,9 +88,32 @@ for img in glob.glob("images project 2/ex4_Images/im_W/*.JPG"):
 
 
 variation_K_Some = [variation_K[0], variation_K[1]]
-# img2 = reconstructImage(variation_K_Some)
-img1 = reconstructImageDif(variation_K, variation_O)
-cv2.imshow("Image1", img1)
+variation_O_Some = [variation_O[0], variation_O[1]]
+variation_W_Some = [variation_W[0], variation_W[1]]
+img_k= reconstructImage(variation_K)
+img_w = reconstructImage(variation_W)
+img_o = reconstructImage(variation_O)
+
+img_k_some = reconstructImage(variation_K_Some)
+img_w_some= reconstructImage(variation_W_Some)
+img_o_some = reconstructImage(variation_O_Some)
+K_O = reconstructImageDif(variation_K, variation_O)
+
+# cv2.imshow("Image1", img1)
 # cv2.imshow("Image2", img2)
+# cv2.imshow("avgface_kid", avgface_kid)
+# cv2.imshow("avgface_woman", avgface_woman)
+# cv2.imshow("avgface_old", avgface_old)
+cv2.imshow("img_k", img_k)
+cv2.imshow("img_w", img_w)
+cv2.imshow("img_o", img_o)
+cv2.imshow("img_k_some", img_k_some)
+cv2.imshow("img_w_some", img_w_some)
+cv2.imshow("img_o_some", img_o_some)
+cv2.imshow("kid and old woman", K_O)
+cv2.imshow("eigf_k", abs(eigf_k[0]) / np.max(abs(eigf_k[0])))
+cv2.imshow("eigf_o", abs(eigf_O[0]) / np.max(abs(eigf_O[0])))
+cv2.imshow("eigf_w", abs(eigf_W[0]) / np.max(abs(eigf_W[0])))
+
 cv2.waitKey(0)
 cv2.destroyAllWindows()
